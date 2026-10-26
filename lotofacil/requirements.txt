@@ -1,0 +1,4 @@
+# Dependências opcionais — o app roda só com a stdlib do Python 3.7+.
+# Descomente se quiser experimentar uma migração para FastAPI:
+# fastapi>=0.100.0
+# uvicorn>=0.22.0

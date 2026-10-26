@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Lotofácil Combinador - 15 a 20 dezenas</title>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem("lotofacil-theme") === "light") {
+                    document.documentElement.setAttribute("data-theme", "light");
+                }
+            } catch (_) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="true"></div>
+    <div class="app-shell">
+        <nav class="top-nav">
+            <div class="top-nav-brand">
+                <div class="logo-icon logo-icon-sm">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span class="top-nav-title">LotoFacil Combinador</span>
+            </div>
+            <div class="top-nav-actions">
+                <div class="layout-controls">
+                    <button type="button" class="btn btn-ghost btn-sm" id="btn-scroll-compare" title="Ir para comparação de sorteios">Comparar</button>
+                    <button type="button" class="btn btn-ghost btn-sm" id="btn-expand-all" title="Expandir todos os painéis">Expandir</button>
+                    <button type="button" class="btn btn-ghost btn-sm" id="btn-collapse-all" title="Recolher todos os painéis">Recolher</button>
+                </div>
+                <button type="button" class="btn-theme-toggle" id="btn-theme-toggle" aria-label="Alternar tema claro ou escuro" title="Alternar tema">
+                    <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </nav>
+
+        <div class="app-container" data-workflow="filter">
+            <section class="page-hero">
+                <h2 class="page-hero-title">Monte sua estratégia Lotofácil</h2>
+                <p class="page-hero-desc">Configure filtros, analise probabilidades e exporte combinações de <strong>15 a 20 dezenas</strong> entre 25.</p>
+                <nav class="workflow-steps" id="workflow-steps" aria-label="Etapas do fluxo">
+                    <button type="button" class="workflow-step is-active" data-step="filter">
+                        <span class="workflow-step-num">1</span>
+                        <span class="workflow-step-label">Filtrar</span>
+                    </button>
+                    <button type="button" class="workflow-step" data-step="analyze">
+                        <span class="workflow-step-num">2</span>
+                        <span class="workflow-step-label">Analisar</span>
+                    </button>
+                    <button type="button" class="workflow-step" data-step="generate">
+                        <span class="workflow-step-num">3</span>
+                        <span class="workflow-step-label">Gerar / Exportar</span>
+                    </button>
+                </nav>
+            </section>
+
+            <div class="workspace">
+                <aside class="controls-panel">
+                <!-- Board -->
+                <div class="dock-panel card is-open" data-panel-id="board" data-default-open="true">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle" aria-expanded="true">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-board">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Tabuleiro de Números</span>
+                                    <span class="dock-panel-sub">Obrigatório, excluído ou neutro</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                        <button type="button" class="btn btn-text btn-sm dock-panel-action" id="btn-reset-board">Resetar</button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <p class="section-desc">Clique nos números: <strong>Neutro</strong>, <strong>Obrigatório</strong> (verde) ou <strong>Excluído</strong> (vermelho).</p>
+                        <div class="board-grid" id="numbers-board"></div>
+                        <div class="board-legend">
+                            <div class="legend-item"><span class="dot dot-neutral"></span> Neutro</div>
+                            <div class="legend-item"><span class="dot dot-include"></span> Obrigatório</div>
+                            <div class="legend-item"><span class="dot dot-exclude"></span> Excluído</div>
+                            <div class="legend-item legend-exclude-seq hidden" id="legend-exclude-sequences"><span class="dot dot-banned"></span> Sequências</div>
+                            <div class="legend-item"><span class="dot dot-last-draw"></span> Último sorteio</div>
+                            <div class="legend-item legend-sequence hidden" id="legend-sequence"><span class="dot dot-sequence"></span> Grupo sequência</div>
+                        </div>
+                        <div class="board-mandatory-badge hidden" id="board-mandatory-badge"></div>
+                    </div>
+                </div>
+
+                <!-- Basic Filters -->
+                <div class="dock-panel card is-open" data-panel-id="filters-basic" data-default-open="true">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle" aria-expanded="true">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-filter">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Filtros Básicos</span>
+                                    <span class="dock-panel-sub">Tamanho, soma, pares e primos</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                        <button type="button" class="btn btn-text btn-sm dock-panel-action" id="btn-reset-filters">Resetar</button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <div class="filter-group game-size-group">
+                            <label for="filter-game-size">Tamanho do jogo</label>
+                            <div class="select-wrapper">
+                                <select id="filter-game-size"></select>
+                            </div>
+                            <p class="section-desc game-size-desc">Combinações de <strong id="game-size-label">20</strong> dezenas entre 25.</p>
+                        </div>
+                        <div class="filter-group">
+                            <label>Soma dos Números: <span id="sum-val">210 - 310</span></label>
+                            <div class="range-slider-container">
+                                <input type="range" id="filter-min-sum" min="210" max="310" value="210" class="slider">
+                                <input type="range" id="filter-max-sum" min="210" max="310" value="310" class="slider">
+                                <div class="slider-track" id="sum-track"></div>
+                            </div>
+                            <div class="slider-labels">
+                                <span id="sum-min-label">Mín: 210</span>
+                                <span id="sum-max-label">Máx: 310</span>
+                            </div>
+                        </div>
+                        <div class="filter-row">
+                            <div class="filter-group-half">
+                                <label for="filter-even">Números Pares</label>
+                                <div class="select-wrapper"><select id="filter-even"></select></div>
+                            </div>
+                            <div class="filter-group-half">
+                                <label for="filter-odd">Números Ímpares</label>
+                                <div class="select-wrapper"><select id="filter-odd"></select></div>
+                            </div>
+                        </div>
+                        <p class="section-desc parity-sync-hint" id="parity-sync-hint">Pares + ímpares = <strong id="parity-total-label">20</strong> dezenas do jogo.</p>
+                        <div class="filter-group">
+                            <label for="filter-prime">Números Primos</label>
+                            <div class="select-wrapper"><select id="filter-prime"></select></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Draw Filters -->
+                <div class="dock-panel card" data-panel-id="filters-draw" data-default-open="false">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle" aria-expanded="false">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-draw">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Sorteios e Dezenas</span>
+                                    <span class="dock-panel-sub">Repetição, remoção e sequências</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <div class="filter-group repeat-filters">
+                            <label for="filter-last-draw">Repetição do Último Sorteio</label>
+                            <p class="section-desc repeat-desc">Cole as <strong>15 dezenas</strong> do último concurso e marque quantas devem repetir.</p>
+                            <textarea id="filter-last-draw" rows="2" placeholder="Cole as 15 dezenas do último sorteio. Ex:
+01 03 05 07 09 10 12 14 16 17 18 20 22 24 25"></textarea>
+                            <div class="textarea-status" id="last-draw-status">Nenhum sorteio inserido</div>
+
+                            <div class="repeat-stats-panel" id="repeat-stats-panel">
+                                <p class="repeat-stats-title">Padrão de repetição (histórico vs teoria)</p>
+                                <p class="repeat-stats-desc">Quantas dezenas do concurso anterior costumam repetir no sorteio seguinte.</p>
+                                <div class="repeat-stats-legend">
+                                    <span><i class="repeat-legend-dot hist"></i> Histórico</span>
+                                    <span><i class="repeat-legend-dot theory"></i> Teoria</span>
+                                    <span><i class="repeat-legend-dot rec"></i> Sugerido</span>
+                                </div>
+                                <div class="repeat-stats-chart" id="repeat-stats-chart"></div>
+                                <p class="repeat-stats-footnote" id="repeat-stats-footnote"></p>
+                            </div>
+
+                            <p class="repeat-counts-label">Repetições do último sorteio no seu jogo:</p>
+                            <div class="repeat-counts-toolbar">
+                                <button type="button" class="btn btn-text btn-sm" id="btn-repeat-recommended">Sugerir 8, 9 e 10</button>
+                                <button type="button" class="btn btn-text btn-sm" id="btn-repeat-all">Marcar todas</button>
+                                <button type="button" class="btn btn-text btn-sm" id="btn-repeat-none">Desmarcar todas</button>
+                            </div>
+                            <div class="repeat-counts-grid" id="repeat-counts-grid"></div>
+                            <div class="repeat-options-summary hidden" id="repeat-options-summary">
+                                <p class="repeat-options-title">Jogos possíveis por repetição</p>
+                                <p class="repeat-options-desc">Com o último sorteio e os filtros atuais, quantas combinações existem se o jogo repetir exatamente N dezenas do concurso anterior.</p>
+                                <div class="repeat-options-list" id="repeat-options-list"></div>
+                                <p class="repeat-options-total" id="repeat-options-total"></p>
+                            </div>
+                            <div class="repeat-auto-badge" id="repeat-auto-badge">Cole o último sorteio — 8, 9 e 10 repetições serão sugeridas automaticamente.</div>
+                        </div>
+                        <div class="filter-group exclude-sequences-filters">
+                            <label for="filter-exclude-sequences">Excluir sequências (uma por linha)</label>
+                            <p class="section-desc">Cada <strong>linha</strong> é uma sequência separada (1 a 15 dezenas). Remove jogos que tenham <strong>todas</strong> as dezenas da linha juntas. Várias linhas <strong>se somam</strong>: cada uma exclui mais jogos.</p>
+                            <textarea id="filter-exclude-sequences" rows="5" spellcheck="false" placeholder="Linha 1: 01 02&#10;Linha 2: 03 04 05 06&#10;Linha 3: 20 21 22 23 24 25"></textarea>
+                            <div class="repeat-counts-toolbar">
+                                <button type="button" class="btn btn-text btn-sm" id="btn-exclude-sequences-clear">Limpar</button>
+                            </div>
+                            <div class="textarea-status" id="exclude-sequences-status">Nenhuma sequência definida</div>
+                            <div class="exclude-sequences-lines hidden" id="exclude-sequences-lines"></div>
+                            <div class="exclude-sequences-badge" id="exclude-sequences-badge"></div>
+                        </div>
+                        <div class="filter-group sequence-filters">
+                            <label for="filter-sequence-group">Grupo / Sequência de Dezenas</label>
+                            <textarea id="filter-sequence-group" rows="2" placeholder="De 1 a 15 dezenas. Ex: 01 02 03 04 05 06"></textarea>
+                            <div class="textarea-status" id="sequence-group-status">Nenhum grupo definido</div>
+                            <div class="sequence-options-panel hidden" id="sequence-options-panel">
+                                <p class="sequence-counts-label">Excluir jogos que tenham deste grupo no jogo:</p>
+                                <div class="sequence-counts-toolbar">
+                                    <button type="button" class="btn btn-text btn-sm" id="btn-sequence-all">Marcar todas</button>
+                                    <button type="button" class="btn btn-text btn-sm" id="btn-sequence-none">Desmarcar todas</button>
+                                </div>
+                                <div class="repeat-counts-grid" id="sequence-counts-grid"></div>
+                                <div class="sequence-auto-badge" id="sequence-auto-badge"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="dock-panel card" data-panel-id="filters-advanced" data-default-open="false">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle" aria-expanded="false">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-advanced">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Filtros Avançados</span>
+                                    <span class="dock-panel-sub">Histórico, padrões e exclusões</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <div class="filter-group sequence-consecutive-filters">
+                            <label>Sequências consecutivas</label>
+                            <p class="section-desc">Remove jogos com bloco sem buraco no volante. Ex.: 10 seguidos cobre <strong>01–10</strong>, <strong>02–11</strong>, <strong>03–12</strong>… até <strong>16–25</strong>.</p>
+                            <div class="checkbox-list">
+                                <label class="checkbox-item"><input type="checkbox" id="filter-exclude-sequence-6"><span>6 seguidos <em>(01–06, 02–07…)</em></span></label>
+                                <label class="checkbox-item"><input type="checkbox" id="filter-exclude-sequence-7"><span>7 seguidos <em>(01–07, 02–08…)</em></span></label>
+                                <label class="checkbox-item"><input type="checkbox" id="filter-exclude-sequence-8"><span>8 seguidos <em>(01–08, 02–09…)</em></span></label>
+                                <label class="checkbox-item"><input type="checkbox" id="filter-exclude-sequence-9"><span>9 seguidos <em>(01–09, 02–10…)</em></span></label>
+                                <label class="checkbox-item"><input type="checkbox" id="filter-exclude-sequence-10"><span>10 seguidos <em>(01–10, 02–11…)</em></span></label>
+                                <label class="checkbox-item"><input type="checkbox" id="filter-run-budget"><span>Limitar blocos longos (ex.: um de 5 e o resto até 4)</span></label>
+                            </div>
+                            <div class="run-budget-controls hidden" id="run-budget-controls">
+                                <p class="section-desc">Evita dois blocos longos no mesmo jogo, como <strong>01 02 03 04 05</strong> e depois <strong>21 22 23 24 25</strong>.</p>
+                                <div class="run-budget-grid">
+                                    <label class="run-budget-field">
+                                        <span>Permitir até</span>
+                                        <input type="number" id="filter-run-budget-count" min="0" max="3" value="1">
+                                    </label>
+                                    <label class="run-budget-field">
+                                        <span>bloco(s) de</span>
+                                        <input type="number" id="filter-run-budget-primary" min="3" max="8" value="5">
+                                    </label>
+                                    <label class="run-budget-field">
+                                        <span>Demais no máximo</span>
+                                        <input type="number" id="filter-run-budget-other" min="2" max="7" value="4">
+                                    </label>
+                                </div>
+                                <p class="run-budget-hint" id="run-budget-hint">Até 1 sequência de 5; as outras com no máximo 4 seguidos.</p>
+                            </div>
+                        </div>
+                        <div class="filter-group improbable-filters">
+                            <label>Padrões Improváveis</label>
+                            <div class="checkbox-list">
+                                <label class="checkbox-item"><input type="checkbox" id="filter-exclude-max-evens"><span>Quase todos pares <em id="improb-max-evens-label">(máx. pares)</em></span></label>
+                                <label class="checkbox-item"><input type="checkbox" id="filter-exclude-max-odds"><span>Quase todos ímpares <em id="improb-max-odds-label">(máx. ímpares)</em></span></label>
+                            </div>
+                        </div>
+                        <div class="filter-group import-draws-filters">
+                            <label for="filter-import-draws-file">Importar Sorteios Históricos (TXT)</label>
+                            <p class="section-desc" id="import-draws-desc">Um sorteio por linha com <strong>15 dezenas</strong>. O arquivo também alimenta a análise de <strong>sequências consecutivas</strong> no painel abaixo.</p>
+                            <div class="file-import-row">
+                                <label class="file-input-label" for="filter-import-draws-file">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                    Escolher arquivo .txt
+                                </label>
+                                <input type="file" id="filter-import-draws-file" accept=".txt,text/plain" class="file-input-hidden">
+                                <button type="button" class="btn btn-text btn-sm" id="btn-clear-imported-draws">Limpar</button>
+                            </div>
+                            <div class="textarea-status" id="import-draws-status">Nenhum arquivo importado</div>
+                            <div class="import-draws-stats hidden" id="import-draws-stats">
+                                <div class="import-stat-item"><span class="import-stat-label">Sorteios no arquivo</span><span class="import-stat-value" id="import-stat-draws">—</span></div>
+                                <div class="import-stat-item"><span class="import-stat-label">Excluídas pelos sorteios</span><span class="import-stat-value" id="import-stat-excluded-draws">—</span></div>
+                                <div class="import-stat-item"><span class="import-stat-label">Restantes após sorteios</span><span class="import-stat-value" id="import-stat-remaining-draws">—</span></div>
+                                <div class="import-stat-item hidden" id="import-stat-other-row"><span class="import-stat-label">Excluídas pelos outros filtros</span><span class="import-stat-value" id="import-stat-excluded-other">—</span></div>
+                                <div class="import-stat-item import-stat-final"><span class="import-stat-label">Combinações finais</span><span class="import-stat-value" id="import-stat-remaining">—</span></div>
+                                <div class="import-stat-item import-stat-note"><span id="import-stat-note"></span></div>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-exclude-games">Excluir Jogos Manualmente (15 dez./linha)</label>
+                            <textarea id="filter-exclude-games" placeholder="Um jogo por linha com 15 dezenas"></textarea>
+                            <div class="textarea-status" id="exclude-games-status">Nenhum jogo inserido</div>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-exclude-combos" id="exclude-combos-label">Excluir Combinações (20 dez./linha)</label>
+                            <textarea id="filter-exclude-combos" placeholder="Combinações completas, uma por linha"></textarea>
+                            <div class="textarea-status" id="exclude-combos-status">Nenhuma combinação inserida</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="dock-panel card is-open" data-panel-id="actions" data-default-open="true" data-workflow-panels="generate">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle" aria-expanded="true">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-action">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Ações e Exportação</span>
+                                    <span class="dock-panel-sub">Exportar ou simular jogo</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <div class="smart-games-panel" id="smart-games-panel">
+                            <p class="section-desc">Usa <strong>todos os filtros marcados</strong> e, se houver histórico importado, aprende padrões (paridade, soma, frequência, blocos) para priorizar jogos parecidos. <strong>Modo memória:</strong> tudo que os filtros removem não entra nos jogos nem na exportação e conta como resultado que não sai, e a chance de acerto de cada jogo reflete isso.</p>
+                            <p class="smart-games-history-status" id="smart-games-history-status">Importe o histórico na sidebar para ativar a geração guiada por padrões.</p>
+                            <div class="smart-games-controls">
+                                <label class="smart-games-field">
+                                    <span>Quantidade de jogos</span>
+                                    <input type="number" id="smart-games-count" min="1" max="50" value="5">
+                                </label>
+                                <label class="smart-games-field">
+                                    <span>Máx. penalidade de padrão</span>
+                                    <select id="smart-games-max-score">
+                                        <option value="" selected>Automático (preenche a quantidade)</option>
+                                        <option value="18">Rígido (≤ 18) — melhor em 15 dez.</option>
+                                        <option value="55">Equilibrado (≤ 55)</option>
+                                        <option value="120">Flexível (≤ 120) — 18–20 dez.</option>
+                                        <option value="250">Amplo (≤ 250)</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="required-blocks-group">
+                                <label class="checkbox-item"><input type="checkbox" id="filter-require-blocks"><span>Exigir blocos de seguidos <em>(padrão do histórico)</em></span></label>
+                                <div class="required-blocks-controls hidden" id="required-blocks-controls">
+                                    <div class="checkbox-list required-blocks-lengths">
+                                        <label class="checkbox-item"><input type="checkbox" class="require-block-length" value="3" checked><span>3 seguidos <em>(ex.: 07 08 09)</em></span></label>
+                                        <label class="checkbox-item"><input type="checkbox" class="require-block-length" value="4" checked><span>4 seguidos <em>(ex.: 11 12 13 14)</em></span></label>
+                                    </div>
+                                    <label class="smart-games-field">
+                                        <span>Mínimo de blocos no jogo</span>
+                                        <input type="number" id="filter-require-blocks-min" min="1" max="4" value="1">
+                                    </label>
+                                    <p class="run-budget-hint" id="required-blocks-hint">Bloco de tamanho exato: um bloco de 5 não conta como 3 nem 4.</p>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block" id="btn-generate-smart-games">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                                Gerar Jogos Inteligentes
+                            </button>
+                        </div>
+                        <div class="actions-grid">
+                            <button class="btn btn-outline" id="btn-export-txt">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                                Exportar TXT
+                            </button>
+                            <button class="btn btn-outline" id="btn-export-csv">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                                Exportar CSV
+                            </button>
+                            <button class="btn btn-primary" id="btn-random-draw">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                Simular Jogo Inteligente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </aside>
+
+                <section class="results-panel">
+                <div class="header-stats">
+                    <div class="stat-badge total">
+                        <span class="label" title="Total matemático de combinações">Universo</span>
+                        <span class="val" id="total-combinations-badge">53.130</span>
+                    </div>
+                    <div class="stat-badge matching">
+                        <span class="label" title="Combinações após filtros">Filtradas</span>
+                        <span class="val animate-pulse" id="filtered-combinations-badge">53.130</span>
+                    </div>
+                    <div class="stat-badge percent">
+                        <span class="label">Proporção</span>
+                        <span class="val" id="proportion-badge">100%</span>
+                    </div>
+                </div>
+                <div class="filter-progress hidden" id="filter-progress" role="status" aria-live="polite"></div>
+
+                <div class="dock-panel card probability-card is-open" data-panel-id="probability" data-default-open="true" data-workflow-panels="analyze">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle dock-panel-toggle-card" aria-expanded="true">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-prob">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Probabilidades e Custos</span>
+                                    <span class="dock-panel-sub">Matemática real · tabela Caixa</span>
+                                </span>
+                            </span>
+                            <span class="badge" id="prob-tickets-badge">0 cartelas</span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <p class="section-desc prob-desc">Sorteio: 15 dezenas entre 25. Valores oficiais da Caixa. Com filtro, entra o modo memória: o que foi filtrado não sai mais e as % por cartela sobem junto.</p>
+                        <p class="prob-disclaimer" id="prob-math-disclaimer"></p>
+
+                        <p class="prob-section-title">Custos e expectativa (Caixa)</p>
+                        <div class="prob-economics-summary" id="prob-economics-summary"></div>
+                        <p class="prob-disclaimer" id="prob-economics-disclaimer"></p>
+
+                        <p class="prob-section-title">Tabela oficial de preços</p>
+                        <div class="prob-price-table-wrap">
+                            <div class="prob-price-table-header">
+                                <span>Dezenas</span>
+                                <span>Valor da aposta</span>
+                                <span>Equiv. cartelas 15 dez.</span>
+                                <span>Retorno fixo esperado*</span>
+                            </div>
+                            <div class="prob-price-table-body" id="prob-price-table-body"></div>
+                        </div>
+                        <p class="prob-footnote">* Expectativa com prêmios fixos (11–14 ac.). Prêmio de 15 acertos não incluído.</p>
+
+                        <p class="prob-section-title">Resumo do filtro (<span id="prob-active-size">20</span> dezenas)</p>
+                        <div class="probability-grid prob-filter-summary">
+                            <div class="prob-item">
+                                <span class="prob-label">Lembrado pelo filtro (não sai)</span>
+                                <span class="prob-val" id="prob-universe-pct">0%</span>
+                                <span class="prob-sub" id="prob-universe-odds">Nenhuma combinação removida</span>
+                            </div>
+                            <div class="prob-item highlight">
+                                <span class="prob-label">Chance por cartela (15 ac.)</span>
+                                <span class="prob-val" id="prob-filtered-pct">—</span>
+                                <span class="prob-sub" id="prob-filtered-odds">—</span>
+                            </div>
+                        </div>
+                        <p class="prob-section-title" id="prob-hits-section-title">Por cartela — modo memória</p>
+                        <div class="prob-hits-grid" id="prob-hits-grid"></div>
+                        <p class="prob-footnote" id="prob-hits-footnote">Odds hipergeométricas. Com filtro, o que foi removido não sai mais.</p>
+                        <p class="prob-section-title">Comparativo por tamanho de jogo</p>
+                        <div class="prob-games-wrap">
+                            <div class="prob-games-header">
+                                <span class="col-dez">Dezenas</span>
+                                <span class="col-total">Combinações</span>
+                                <span class="col-hit">15 ac.</span>
+                                <span class="col-hit">14 ac.</span>
+                                <span class="col-hit">13 ac.</span>
+                                <span class="col-hit">12 ac.</span>
+                                <span class="col-hit">11 ac.</span>
+                            </div>
+                            <div class="prob-games-rows" id="prob-games-body"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dock-panel card analytics-card" data-panel-id="analytics" data-default-open="false" data-workflow-panels="analyze">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle dock-panel-toggle-card" aria-expanded="false">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-chart">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Análise de Distribuição</span>
+                                    <span class="dock-panel-sub">Somas, pares e primos</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <div class="charts-container">
+                            <div class="chart-wrapper">
+                                <h3>Distribuição de Somas</h3>
+                                <div class="custom-chart" id="chart-somas"><div class="chart-empty-state">Sem dados correspondentes</div></div>
+                            </div>
+                            <div class="chart-grid-2">
+                                <div class="chart-wrapper">
+                                    <h3>Números Pares</h3>
+                                    <div class="custom-chart bar-compact" id="chart-pares"><div class="chart-empty-state">Sem dados</div></div>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <h3>Números Primos</h3>
+                                    <div class="custom-chart bar-compact" id="chart-primos"><div class="chart-empty-state">Sem dados</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-result card hidden" id="simulation-box" data-workflow-panels="generate">
+                    <div class="simulation-header">
+                        <h3 id="simulation-title">Jogo Simulado</h3>
+                        <button class="btn-close" id="btn-close-simulation">&times;</button>
+                    </div>
+                    <p class="smart-games-disclaimer" id="smart-games-disclaimer">Distribuição no volante (heurística). Não é previsão nem aumento de probabilidade.</p>
+                    <div class="smart-games-toolbar hidden" id="smart-games-toolbar">
+                        <button type="button" class="btn btn-outline btn-sm" id="btn-copy-smart-all">Copiar todos</button>
+                        <span class="smart-games-copy-hint">Texto selecionável em cada jogo</span>
+                    </div>
+                    <div class="simulated-numbers" id="simulated-numbers-container"></div>
+                    <div class="simulation-meta" id="simulation-meta-text">Soma: 250 | Pares: 10 | Primos: 7</div>
+                    <div class="smart-games-list hidden" id="smart-games-list"></div>
+                    <div class="smart-games-footer hidden" id="smart-games-footer"></div>
+                    <div class="smart-games-banner hidden" id="smart-games-banner" role="status"></div>
+                </div>
+
+                <div class="dock-panel card combinations-card is-open" data-panel-id="combinations" data-default-open="true" data-workflow-panels="filter analyze generate">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle dock-panel-toggle-card" aria-expanded="true">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-list">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Combinações Encontradas</span>
+                                    <span class="dock-panel-sub">Resultados filtrados</span>
+                                </span>
+                            </span>
+                            <span class="badge" id="results-count">Mostrando 0 de 0</span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <div class="combinations-toolbar">
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-copy-page" title="Copia todas as combinações visíveis nesta página">
+                                Copiar página
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-copy-selected" disabled title="Copia as linhas marcadas">
+                                Copiar selecionadas
+                            </button>
+                            <span class="combinations-copy-hint">Texto selecionável · marque linhas ou use Copiar</span>
+                        </div>
+                        <div class="combinations-list-container">
+                            <div class="combinations-header-row">
+                                <span class="col-check" aria-hidden="true"></span>
+                                <span class="col-index">#</span>
+                                <span class="col-numbers">Dezenas</span>
+                                <span class="col-sum">Soma</span>
+                                <span class="col-even">Pares</span>
+                                <span class="col-prime">Primos</span>
+                                <span class="col-repeat hidden" id="col-repeat-header">Rep.</span>
+                                <span class="col-copy">Copiar</span>
+                            </div>
+                            <div class="combinations-rows" id="combinations-table-body">
+                                <div class="table-loading">Carregando dados...</div>
+                            </div>
+                        </div>
+                        <div class="pagination-container">
+                            <label class="page-size-control" for="filter-page-size">
+                                <span>Por página</span>
+                                <select id="filter-page-size">
+                                    <option value="10">10</option>
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="300">300</option>
+                                    <option value="400">400</option>
+                                </select>
+                            </label>
+                            <button class="btn btn-pagination" id="btn-page-first" disabled>&laquo;</button>
+                            <button class="btn btn-pagination" id="btn-page-prev" disabled>Anterior</button>
+                            <span class="page-indicator" id="page-indicator">Página 1 de 1</span>
+                            <button class="btn btn-pagination" id="btn-page-next" disabled>Próxima</button>
+                            <button class="btn btn-pagination" id="btn-page-last" disabled>&raquo;</button>
+                        </div>
+                    </div>
+                </div>
+                </section>
+            </div>
+
+            <section class="number-frequency-full" id="number-frequency-section" data-workflow-panels="analyze">
+                <div class="dock-panel card" data-panel-id="number-frequency" data-default-open="false">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle" aria-expanded="false">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-frequency">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 20V10M10 20V4M16 20v-8M22 20V8"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Frequência das Dezenas</span>
+                                    <span class="dock-panel-sub">Análise a partir dos sorteios importados</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <p class="number-frequency-source" id="number-frequency-source">Importe um arquivo .txt na sidebar para gerar o ranking de frequência.</p>
+                        <p class="historical-data-note" id="historical-data-note"></p>
+                        <div class="cooccurrence-panel" id="cooccurrence-panel">
+                            <h3 class="cooccurrence-title">Os 5 mais sorteados saem juntos?</h3>
+                            <p class="cooccurrence-desc" id="cooccurrence-desc">Teoria combinatória vs histórico agregado (~3.733 concursos).</p>
+                            <p class="cooccurrence-verdict" id="cooccurrence-verdict"></p>
+                            <div class="cooccurrence-stats-grid" id="cooccurrence-stats-grid"></div>
+                            <div class="cooccurrence-pairs" id="cooccurrence-pairs"></div>
+                            <p class="cooccurrence-note" id="cooccurrence-independence"></p>
+                            <p class="cooccurrence-note cooccurrence-betting" id="cooccurrence-betting"></p>
+                        </div>
+                        <div class="number-frequency-empty" id="number-frequency-empty">
+                            Nenhum sorteio disponível. Use <strong>Importar Sorteios Históricos (TXT)</strong> ou cole jogos de 15 dezenas em <strong>Excluir Jogos Manualmente</strong>.
+                        </div>
+                        <div class="number-frequency-content hidden" id="number-frequency-content">
+                        <div class="number-frequency-highlights">
+                            <div class="freq-highlight-box freq-hot">
+                                <p class="freq-highlight-title">Mais sorteadas</p>
+                                <ul class="freq-highlight-list" id="freq-most-list"></ul>
+                            </div>
+                            <div class="freq-highlight-box freq-cold">
+                                <p class="freq-highlight-title">Menos sorteadas</p>
+                                <ul class="freq-highlight-list" id="freq-least-list"></ul>
+                            </div>
+                        </div>
+
+                        <div class="consecutive-sequences-panel" id="consecutive-sequences-panel">
+                            <p class="consecutive-sequences-title">Sequências consecutivas nos sorteios</p>
+                            <p class="consecutive-sequences-desc">Analisa os arquivos importados (e jogos manuais de 15 dez.) e lista quais blocos seguidos no volante — ex.: <strong>01 02 03 04</strong>, <strong>05 06 07 08</strong> — mais apareceram.</p>
+                            <p class="consecutive-sequences-source" id="consecutive-sequences-source">Importe um arquivo .txt na sidebar (Excluir sorteios) para gerar o ranking.</p>
+                            <div class="consecutive-sequences-empty" id="consecutive-sequences-empty">
+                                Nenhum sorteio disponível. Use <strong>Importar Sorteios Históricos (TXT)</strong> ou cole jogos de 15 dezenas em Excluir Jogos Manualmente.
+                            </div>
+                            <div class="consecutive-sequences-content hidden" id="consecutive-sequences-content">
+                                <div class="consecutive-sequences-summary" id="consecutive-sequences-summary"></div>
+                                <p class="compare-section-title">Sorteios com bloco consecutivo de pelo menos</p>
+                                <div class="consecutive-atleast-grid" id="consecutive-atleast-grid"></div>
+                                <p class="compare-section-title">Maior bloco consecutivo por sorteio</p>
+                                <div class="consecutive-maxrun-grid" id="consecutive-maxrun-grid"></div>
+                                <div class="consecutive-length-toolbar" id="consecutive-length-toolbar"></div>
+                                <p class="compare-section-title">Ranking de sequências</p>
+                                <div class="consecutive-sequences-table" id="consecutive-sequences-table"></div>
+                                <p class="consecutive-sequences-footnote" id="consecutive-sequences-footnote"></p>
+                            </div>
+                        </div>
+
+                        <div class="number-frequency-layout">
+                            <div class="number-frequency-chart-wrap">
+                                <p class="compare-section-title">Ranking completo (1–25)</p>
+                                <div class="number-frequency-chart" id="number-frequency-chart"></div>
+                                <p class="number-frequency-footnote" id="number-frequency-footnote"></p>
+                            </div>
+                            <div class="number-frequency-board-wrap">
+                                <p class="compare-section-title">Mapa no volante</p>
+                                <div class="board-grid board-grid-compact number-frequency-grid" id="number-frequency-board"></div>
+                                <div class="board-legend compare-legend">
+                                    <div class="legend-item"><span class="dot dot-freq-hot"></span> Top 5</div>
+                                    <div class="legend-item"><span class="dot dot-freq-neutral"></span> Média</div>
+                                    <div class="legend-item"><span class="dot dot-freq-cold"></span> Bottom 5</div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="compare-draws-full" id="compare-draws-section" data-workflow-panels="analyze">
+                <div class="dock-panel card" data-panel-id="compare-draws" data-default-open="false">
+                    <div class="dock-panel-header">
+                        <button type="button" class="dock-panel-toggle" aria-expanded="false">
+                            <span class="dock-panel-meta">
+                                <span class="dock-panel-icon dock-icon-compare">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M17 17l4 4"/></svg>
+                                </span>
+                                <span class="dock-panel-titles">
+                                    <span class="dock-panel-title">Comparar Últimos Sorteios</span>
+                                    <span class="dock-panel-sub">5 tabuleiros lado a lado — padrões dos concursos anteriores</span>
+                                </span>
+                            </span>
+                            <svg class="dock-chevron" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                        <button type="button" class="btn btn-text btn-sm dock-panel-action" id="btn-compare-clear">Limpar</button>
+                    </div>
+                    <div class="dock-panel-body">
+                        <p class="section-desc">Cole <strong>15 dezenas</strong> de cada concurso anterior. Os tabuleiros ficam aqui em largura total para facilitar a comparação visual.</p>
+                        <div class="compare-draws-layout">
+                            <div class="compare-boards-grid" id="compare-boards-container"></div>
+                            <div class="compare-frequency-block">
+                                <p class="compare-section-title">Mapa de frequência</p>
+                                <div class="board-grid board-grid-compact compare-freq-grid" id="compare-frequency-board"></div>
+                                <div class="board-legend compare-legend">
+                                    <div class="legend-item"><span class="dot dot-freq-0"></span> 0×</div>
+                                    <div class="legend-item"><span class="dot dot-freq-1"></span> 1×</div>
+                                    <div class="legend-item"><span class="dot dot-freq-2"></span> 2×</div>
+                                    <div class="legend-item"><span class="dot dot-freq-3"></span> 3×</div>
+                                    <div class="legend-item"><span class="dot dot-freq-4"></span> 4×</div>
+                                    <div class="legend-item"><span class="dot dot-freq-5"></span> 5×</div>
+                                </div>
+                                <div class="compare-pattern-summary" id="compare-pattern-summary">Nenhum sorteio preenchido.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
